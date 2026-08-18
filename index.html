@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeMail</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f2f5f9;
+      color: #222;
+    }
+
+    .container {
+      width: 380px;
+      max-width: 92%;
+      margin: 70px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      text-align: center;
+      color: #1976d2;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #1976d2;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #125ca8;
+    }
+
+    .switch {
+      text-align: center;
+      margin-top: 18px;
+      color: #1976d2;
+      cursor: pointer;
+    }
+
+    #mailApp {
+      display: none;
+    }
+
+    .header {
+      background: #1976d2;
+      color: white;
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header button {
+      width: auto;
+      margin: 0;
+      padding: 8px 15px;
+      background: white;
+      color: #1976d2;
+    }
+
+    .mailbox {
+      display: flex;
+      min-height: 500px;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: white;
+      padding: 20px;
+      border-right: 1px solid #ddd;
+    }
+
+    .sidebar button {
+      background: #1976d2;
+      margin-bottom: 15px;
+    }
+
+    .sidebar p {
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    .inbox {
+      flex: 1;
+      padding: 25px;
+    }
+
+    .email {
+      background: white;
+      padding: 18px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .email strong {
+      color: #1976d2;
+    }
+
+    .compose {
+      display: none;
+      background: white;
+      padding: 20px;
+      position: fixed;
+      width: 400px;
+      max-width: 90%;
+      right: 20px;
+      bottom: 20px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+      border-radius: 12px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 12px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: none;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN / SIGNUP -->
+  <div class="container" id="auth">
+
+    <h1>FreeMail</h1>
+    <p class="subtitle" id="authTitle">Create your free email</p>
+
+    <div id="signupForm">
+      <input type="text" id="name" placeholder="Your name">
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+
+      <button onclick="signup()">Create Free Account</button>
+
+      <p class="switch" onclick="showLogin()">
+        Already have an account? Login
+      </p>
+    </div>
+
+    <div id="loginForm" style="display:none;">
+      <input type="text" id="loginUsername" placeholder="Username">
+      <input type="password" id="loginPassword" placeholder="Password">
+
+      <button onclick="login()">Login</button>
+
+      <p class="switch" onclick="showSignup()">
+        Create a new account
+      </p>
+    </div>
+
+    <p class="error" id="error"></p>
+  </div>
+
+
+  <!-- MAIL APP -->
+  <div id="mailApp">
+
+    <div class="header">
+      <h2>FreeMail</h2>
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="mailbox">
+
+      <div class="sidebar">
+
+        <button onclick="openCompose()">✉ Compose</button>
+
+        <p onclick="showInbox()">📥 Inbox</p>
+        <p>⭐ Starred</p>
+        <p>📤 Sent</p>
+        <p>🗑 Trash</p>
+
+      </div>
+
+      <div class="inbox" id="inbox">
+
+        <h2>Inbox</h2>
+        <br>
+
+        <div class="email">
+          <strong>FreeMail</strong>
+          <p>Welcome to your new FreeMail account!</p>
+        </div>
+
+        <div class="email">
+          <strong>Admin</strong>
+          <p>Your account has been created successfully.</p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- COMPOSE WINDOW -->
+  <div class="compose" id="compose">
+
+    <h3>New Message</h3>
+
+    <input type="email" id="to" placeholder="To">
+
+    <input type="text" id="subject" placeholder="Subject">
+
+    <textarea id="message" placeholder="Write your message..."></textarea>
+
+    <button onclick="sendMail()">Send</button>
+
+    <button
+      onclick="closeCompose()"
+      style="background:#777;">
+      Cancel
+    </button>
+
+  </div>
+
+
+<script>
+
+  function showLogin() {
+    document.getElementById("signupForm").style.display = "none";
+    document.getElementById("loginForm").style.display = "block";
+    document.getElementById("authTitle").innerText = "Login to FreeMail";
+    document.getElementById("error").innerText = "";
+  }
+
+  function showSignup() {
+    document.getElementById("signupForm").style.display = "block";
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("authTitle").innerText = "Create your free email";
+    document.getElementById("error").innerText = "";
+  }
+
+  function signup() {
+
+    let name = document.getElementById("name").value;
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    if (!name || !username || !password) {
+      document.getElementById("error").innerText =
+        "Please fill in all fields.";
+      return;
+    }
+
+    localStorage.setItem("name", name);
+    localStorage.setItem("username", username);
+    localStorage.setItem("password", password);
+
+    alert(
+      "Account created!\nYour email is: " +
+      username + "@freemail.local"
+    );
+
+    openMail();
+  }
+
+
+  function login() {
+
+    let username = document.getElementById("loginUsername").value;
+    let password = document.getElementById("loginPassword").value;
+
+    let savedUsername = localStorage.getItem("username");
+    let savedPassword = localStorage.getItem("password");
+
+    if (username === savedUsername && password === savedPassword) {
+      openMail();
+    } else {
+      document.getElementById("error").innerText =
+        "Incorrect username or password.";
+    }
+  }
+
+
+  function openMail() {
+
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("mailApp").style.display = "block";
+
+  }
+
+
+  function logout() {
+
+    document.getElementById("mailApp").style.display = "none";
+    document.getElementById("auth").style.display = "block";
+
+    showLogin();
+  }
+
+
+  function openCompose() {
+    document.getElementById("compose").style.display = "block";
+  }
+
+
+  function closeCompose() {
+    document.getElementById("compose").style.display = "none";
+  }
+
+
+  function sendMail() {
+
+    let to = document.getElementById("to").value;
+    let subject = document.getElementById("subject").value;
+    let message = document.getElementById("message").value;
+
+    if (!to || !subject || !message) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    alert(
+      "Demo message created!\n\n" +
+      "To: " + to +
+      "\nSubject: " + subject
+    );
+
+    document.getElementById("to").value = "";
+    document.getElementById("subject").value = "";
+    document.getElementById("message").value = "";
+
+    closeCompose();
+  }
+
+
+  function showInbox() {
+    document.getElementById("inbox").innerHTML = `
+      <h2>Inbox</h2>
+      <br>
+
+      <div class="email">
+        <strong>FreeMail</strong>
+        <p>Welcome to your new FreeMail account!</p>
+      </div>
+
+      <div class="email">
+        <strong>Admin</strong>
+        <p>Your account has been created successfully.</p>
+      </div>
+    `;
+  }
+
+</script>
+
+</body>
+</html>
